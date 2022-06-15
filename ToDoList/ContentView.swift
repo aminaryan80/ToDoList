@@ -36,8 +36,12 @@ struct ContentView: View {
         ToDoItem(name: "todo1", creation_date: Date(), due_date: Date())
     ]
     
+    @State var isAcending = true
+    @State var sortBy = "creationDate"
+    
     @State var selectedIndex = 0
     @State var shouldShowModal = false
+    @State var isShowingSheet = false
     
     @State var selectedDate = Date()
     
@@ -84,13 +88,71 @@ struct ContentView: View {
                                     Image(systemName: "plus.app.fill")
                                 }
                                 Button {
-                                    
+                                    isShowingSheet.toggle()
                                 } label: {
                                     Image(systemName: "arrow.up.arrow.down.square.fill")
+                                }
+                                .sheet(isPresented: $isShowingSheet) {
+                                   // VStack(spacing: 10) {
+                                        List {
+                                        Button {sortBy = "name"} label: {
+                                            HStack() {
+                                                Text("Name")
+                                                if (sortBy == "name") {
+                                                    Spacer()
+                                                    Image(systemName: "checkmark")
+                                                }
+                                            }
+                                        }
+                                        Button {sortBy = "dueDate"} label: {
+                                            HStack() {
+                                                Text("Due Date")
+                                                if (sortBy == "dueDate") {
+                                                    Spacer()
+                                                    Image(systemName: "checkmark")
+                                                }
+                                            }
+                                        }
+                                        Button {sortBy = "creationDate"} label: {
+                                            HStack() {
+                                                Text("Creation Date")
+                                                if (sortBy == "creationDate") {
+                                                    Spacer()
+                                                    Image(systemName: "checkmark")
+                                                }
+                                            }
+                                        }
+                                   // }
+                                    //List {
+                                            Spacer()
+
+                                        Button {isAcending = false} label: {
+                                            HStack() {
+                                                Text("Decending")
+                                                if (!isAcending) {
+                                                    Spacer()
+                                                    Image(systemName: "checkmark")
+                                                }
+                                            }
+                                        }
+                                        Button {isAcending = true} label: {
+                                            HStack() {
+                                                Text("Acending")
+                                                if (isAcending) {
+                                                    Spacer()
+                                                    Image(systemName: "checkmark")
+                                                }
+                                            }
+                                        }
+                                    //}
+                                            Spacer()
+                                    Button("Sort", action: { isShowingSheet.toggle()})
                                 }
                             }
                         }
                     }
+                        
+                }
                     
                 case 1:
                     NavigationView {
@@ -173,9 +235,9 @@ struct ContentView: View {
 //            Text("Second")
 //        }
 //}
-
-struct ContentView_Previews: PreviewProvider {
-    static var previews: some View {
-        ContentView()
-    }
-}
+//
+//struct ContentView_Previews: PreviewProvider {
+//    static var previews: some View {
+//        ContentView()
+//    }
+//}
