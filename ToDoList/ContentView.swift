@@ -39,6 +39,8 @@ struct ContentView: View {
     @State var selectedIndex = 0
     @State var shouldShowModal = false
     
+    @State var selectedDate = Date()
+    
     let tabBarImageNames = ["person", "gear", "plus.app.fill", "pencil", "lasso", "arrow.up.arrow.down.square.fill"]
     
     static let stackDateFormatter: DateFormatter = {
@@ -92,11 +94,23 @@ struct ContentView: View {
                     
                 case 1:
                     NavigationView {
-                        ScrollView {
-                            Text("TEST")
+                            List {
+                                DatePicker("Date", selection: $selectedDate, displayedComponents: .date)
+                                
+                                ForEach(toDoItems, id: \.id) { item in
+                                    if(Calendar.current.compare(item.due_date, to: selectedDate, toGranularity: .day) == .orderedSame) {
+                                        VStack(alignment: .leading, spacing: 10) {
+                                            
+                                            Text("\(item.name)").bold().font(.title2)
+                                            Text("\(item.due_date, formatter: Self.stackDateFormatter)")
+                                        }
+                                    }
+                                    
+                                }
+                                .onDelete(perform: deleteItem)
+                            }
+                            .navigationTitle("second Tab")
                         }
-                        .navigationTitle("Second Tab")
-                    }
                     
                 default:
                     NavigationView {
