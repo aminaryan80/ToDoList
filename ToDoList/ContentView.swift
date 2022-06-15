@@ -7,6 +7,20 @@
 
 import SwiftUI
 
+class ToDoItem {
+    var id: String
+    var name: String
+    var creation_date: Date
+    var due_date: Date
+    
+    init(name: String, creation_date: Date, due_date: Date) {
+        self.id = UUID().uuidString
+        self.name = name
+        self.creation_date = creation_date
+        self.due_date = due_date
+    }
+}
+
 struct ContentView: View {
     
     init() {
@@ -14,10 +28,24 @@ struct ContentView: View {
         UINavigationBar.appearance().barTintColor = .systemBackground
     }
     
+    func deleteItem(at offsets: IndexSet) {
+        toDoItems.remove(atOffsets: offsets)
+    }
+    
+    @State var toDoItems: [ToDoItem] = [
+        ToDoItem(name: "todo1", creation_date: Date(), due_date: Date())
+    ]
+    
     @State var selectedIndex = 0
     @State var shouldShowModal = false
     
-    let tabBarImageNames = ["person", "gear", "plus.app.fill", "pencil", "lasso"]
+    let tabBarImageNames = ["person", "gear", "plus.app.fill", "pencil", "lasso", "arrow.up.arrow.down.square.fill"]
+    
+    static let stackDateFormatter: DateFormatter = {
+            let formatter = DateFormatter()
+            formatter.dateFormat = "E, yyyy-MM-dd HH:mm:ss"
+            return formatter
+        }()
     
     var body: some View {
         VStack(spacing: 0) {
@@ -35,17 +63,39 @@ struct ContentView: View {
                 switch selectedIndex {
                 case 0:
                     NavigationView {
-                        ScrollView {
-                            ForEach(0..<100) { num in
-                                Text("\(num)")
+                        List {
+                            ForEach(toDoItems, id: \.id) { item in
+                                VStack(alignment: .leading, spacing: 10) {
+                                    
+                                    Text("\(item.name)").bold().font(.title2)
+                                    Text("\(item.due_date, formatter: Self.stackDateFormatter)")
+                                }
+                            }
+                            .onDelete(perform: deleteItem)
+                        }
+                        .navigationTitle("First Tab")
+                        .toolbar {
+                            HStack() {
+                                Button {
+                                    
+                                } label: {
+                                    Image(systemName: "plus.app.fill")
+                                }
+                                Button {
+                                    
+                                } label: {
+                                    Image(systemName: "arrow.up.arrow.down.square.fill")
+                                }
                             }
                         }
-                            .navigationTitle("First Tab")
                     }
                     
                 case 1:
-                    ScrollView {
-                        Text("TEST")
+                    NavigationView {
+                        ScrollView {
+                            Text("TEST")
+                        }
+                        .navigationTitle("Second Tab")
                     }
                     
                 default:
