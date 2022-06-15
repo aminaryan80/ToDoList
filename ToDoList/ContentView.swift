@@ -76,8 +76,8 @@ struct ContentView: View {
                         .navigationTitle("First Tab")
                         .toolbar {
                             HStack() {
-                                Button {
-                                    
+                                NavigationLink {
+                                    AddItemView(ToDoItems: $toDoItems)
                                 } label: {
                                     Image(systemName: "plus.app.fill")
                                 }
