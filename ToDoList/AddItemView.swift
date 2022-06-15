@@ -13,14 +13,14 @@ struct AddItemView: View {
     @Binding var ToDoItems: [ToDoItem]
     
     @State var name = ""
-    @State var due_date = Date()
+    @State var dueDate = Date()
     
     @State var isEmptyNameAlertPresented = false
     
     var body: some View {
         Form {
             TextField("Name", text: $name)
-            DatePicker("Date", selection: $due_date)
+            DatePicker("Date", selection: $dueDate)
         }
         .alert("Name cannot be empty!", isPresented: $isEmptyNameAlertPresented) {
             Button("Cancel", role: .cancel) {}
@@ -29,7 +29,7 @@ struct AddItemView: View {
         .toolbar {
             Button {
                 if name != "" {
-                    let item = ToDoItem(name: name, creation_date: Date(), due_date: due_date)
+                    let item = ToDoItem(name: name, creationDate: Date(), dueDate: dueDate)
                     ToDoItems.append(item)
                     mode.wrappedValue.dismiss()
                 } else {

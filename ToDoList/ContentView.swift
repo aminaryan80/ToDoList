@@ -10,14 +10,14 @@ import SwiftUI
 class ToDoItem {
     var id: String
     var name: String
-    var creation_date: Date
-    var due_date: Date
+    var creationDate: Date
+    var dueDate: Date
     
-    init(name: String, creation_date: Date, due_date: Date) {
+    init(name: String, creationDate: Date, dueDate: Date) {
         self.id = UUID().uuidString
         self.name = name
-        self.creation_date = creation_date
-        self.due_date = due_date
+        self.creationDate = creationDate
+        self.dueDate = dueDate
     }
 }
 
@@ -32,8 +32,28 @@ struct ContentView: View {
         toDoItems.remove(atOffsets: offsets)
     }
     
+    func sheetDismissed() {
+        switch sortBy {
+        case "name":
+            toDoItems.sort {
+                $0.name < $1.name
+            }
+        case "dueDate":
+            toDoItems.sort {
+                $0.dueDate < $1.dueDate
+            }
+        default:
+            toDoItems.sort {
+                $0.creationDate < $1.creationDate
+            }
+        }
+        if !isAcending{
+            toDoItems.reverse()
+        }
+    }
+    
     @State var toDoItems: [ToDoItem] = [
-        ToDoItem(name: "todo1", creation_date: Date(), due_date: Date())
+        ToDoItem(name: "todo1", creationDate: Date(), dueDate: Date())
     ]
     
     @State var isAcending = true
@@ -45,7 +65,8 @@ struct ContentView: View {
     
     @State var selectedDate = Date()
     
-    let tabBarImageNames = ["person", "gear", "plus.app.fill", "pencil", "lasso", "arrow.up.arrow.down.square.fill"]
+    let tabBarImageNames = ["list.bullet.rectangle.portrait", "calendar"]
+    let tabBarNames = ["All", "Daily"]
     
     static let stackDateFormatter: DateFormatter = {
             let formatter = DateFormatter()
@@ -59,12 +80,6 @@ struct ContentView: View {
             ZStack {
                 
                 Spacer()
-                    .fullScreenCover(isPresented: $shouldShowModal, content: {
-                        Button(action: {shouldShowModal.toggle()}, label: {
-                            Text("Fullscreen cover")
-                        })
-                    
-                })
                 
                 switch selectedIndex {
                 case 0:
@@ -74,12 +89,15 @@ struct ContentView: View {
                                 VStack(alignment: .leading, spacing: 10) {
                                     
                                     Text("\(item.name)").bold().font(.title2)
-                                    Text("\(item.due_date, formatter: Self.stackDateFormatter)")
+                                    HStack () {
+                                        Image(systemName: "calendar")
+                                        Text("\(item.dueDate, formatter: Self.stackDateFormatter)")
+                                    }
                                 }
                             }
                             .onDelete(perform: deleteItem)
                         }
-                        .navigationTitle("First Tab")
+                        .navigationTitle("All Tasks")
                         .toolbar {
                             HStack() {
                                 NavigationLink {
@@ -92,61 +110,62 @@ struct ContentView: View {
                                 } label: {
                                     Image(systemName: "arrow.up.arrow.down.square.fill")
                                 }
-                                .sheet(isPresented: $isShowingSheet) {
-                                   // VStack(spacing: 10) {
-                                        List {
+                                .sheet(isPresented: $isShowingSheet, onDismiss: sheetDismissed) {
+                                    List {
                                         Button {sortBy = "name"} label: {
                                             HStack() {
-                                                Text("Name")
+                                                Text("Name").foregroundColor(.black)
                                                 if (sortBy == "name") {
                                                     Spacer()
                                                     Image(systemName: "checkmark")
                                                 }
                                             }
                                         }
+                                            
                                         Button {sortBy = "dueDate"} label: {
                                             HStack() {
-                                                Text("Due Date")
+                                                Text("Due Date").foregroundColor(.black)
                                                 if (sortBy == "dueDate") {
                                                     Spacer()
                                                     Image(systemName: "checkmark")
                                                 }
                                             }
                                         }
+                                                
                                         Button {sortBy = "creationDate"} label: {
                                             HStack() {
-                                                Text("Creation Date")
+                                                Text("Creation Date").foregroundColor(.black)
                                                 if (sortBy == "creationDate") {
                                                     Spacer()
                                                     Image(systemName: "checkmark")
                                                 }
                                             }
                                         }
-                                   // }
-                                    //List {
-                                            Spacer()
+                                                
+                                        Spacer()
 
                                         Button {isAcending = false} label: {
                                             HStack() {
-                                                Text("Decending")
+                                                Text("Decending").foregroundColor(.black)
                                                 if (!isAcending) {
                                                     Spacer()
                                                     Image(systemName: "checkmark")
                                                 }
                                             }
                                         }
+                                            
                                         Button {isAcending = true} label: {
                                             HStack() {
-                                                Text("Acending")
+                                                Text("Acending").foregroundColor(.black)
                                                 if (isAcending) {
                                                     Spacer()
                                                     Image(systemName: "checkmark")
                                                 }
                                             }
                                         }
-                                    //}
-                                            Spacer()
-                                    Button("Sort", action: { isShowingSheet.toggle()})
+                                        Spacer()
+                                                
+                                        Button("Sort", action: { isShowingSheet.toggle()})
                                 }
                             }
                         }
@@ -160,18 +179,21 @@ struct ContentView: View {
                                 DatePicker("Date", selection: $selectedDate, displayedComponents: .date)
                                 
                                 ForEach(toDoItems, id: \.id) { item in
-                                    if(Calendar.current.compare(item.due_date, to: selectedDate, toGranularity: .day) == .orderedSame) {
+                                    if(Calendar.current.compare(item.dueDate, to: selectedDate, toGranularity: .day) == .orderedSame) {
                                         VStack(alignment: .leading, spacing: 10) {
                                             
                                             Text("\(item.name)").bold().font(.title2)
-                                            Text("\(item.due_date, formatter: Self.stackDateFormatter)")
+                                            HStack () {
+                                                Image(systemName: "calendar")
+                                                Text("\(item.dueDate, formatter: Self.stackDateFormatter)")
+                                            }
                                         }
                                     }
                                     
                                 }
                                 .onDelete(perform: deleteItem)
                             }
-                            .navigationTitle("second Tab")
+                            .navigationTitle("Daily Tasks")
                         }
                     
                 default:
@@ -183,7 +205,6 @@ struct ContentView: View {
                 
             }
             
-//            Spacer()
             
             Divider()
                 .padding(.bottom, 8)
@@ -191,26 +212,15 @@ struct ContentView: View {
             HStack {
                 ForEach(0..<2) { num in
                     Button(action: {
-                        
-                        if num == 2 {
-                            shouldShowModal.toggle()
-                            return
-                        }
-                        
                         selectedIndex = num
                     }, label: {
                         Spacer()
-                        
-                        if num == 2 {
-                            Image(systemName: tabBarImageNames[num])
-                                .font(.system(size: 44, weight: .bold))
-                                .foregroundColor(.red)
-                        } else {
+                        VStack {
                             Image(systemName: tabBarImageNames[num])
                                 .font(.system(size: 24, weight: .bold))
                                 .foregroundColor(selectedIndex == num ? Color(.black) : .init(white: 0.8))
+                            Text(tabBarNames[num]).foregroundColor(selectedIndex == num ? Color(.black) : .init(white: 0.8)).font(.caption)
                         }
-                        
                         
                         Spacer()
                     })
