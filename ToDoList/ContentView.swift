@@ -32,7 +32,7 @@ struct ContentView: View {
         toDoItems.remove(atOffsets: offsets)
     }
     
-    func sheetDismissed() {
+    func sortItems() {
         switch sortBy {
         case "name":
             toDoItems.sort {
@@ -52,9 +52,13 @@ struct ContentView: View {
         }
     }
     
-    @State var toDoItems: [ToDoItem] = [
-        ToDoItem(name: "todo1", creationDate: Date(), dueDate: Date())
-    ]
+    func sortItemsByDueDate() {
+        toDoItems.sort {
+            $0.dueDate < $1.dueDate
+        }
+    }
+    
+    @State var toDoItems: [ToDoItem] = []
     
     @State var isAcending = true
     @State var sortBy = "creationDate"
@@ -98,6 +102,9 @@ struct ContentView: View {
                             .onDelete(perform: deleteItem)
                         }
                         .navigationTitle("All Tasks")
+                        .onAppear {
+                            sortItems()
+                        }
                         .toolbar {
                             HStack() {
                                 NavigationLink {
@@ -110,7 +117,7 @@ struct ContentView: View {
                                 } label: {
                                     Image(systemName: "arrow.up.arrow.down.square.fill")
                                 }
-                                .sheet(isPresented: $isShowingSheet, onDismiss: sheetDismissed) {
+                                .sheet(isPresented: $isShowingSheet, onDismiss: sortItems) {
                                     List {
                                         Button {sortBy = "name"} label: {
                                             HStack() {
@@ -189,11 +196,13 @@ struct ContentView: View {
                                             }
                                         }
                                     }
-                                    
                                 }
                                 .onDelete(perform: deleteItem)
                             }
                             .navigationTitle("Daily Tasks")
+                            .onAppear {
+                                sortItemsByDueDate()
+                            }
                         }
                     
                 default:
@@ -232,22 +241,3 @@ struct ContentView: View {
         }
     }
 }
-
-//TabView {
-//    Text("First")
-//        .tabItem {
-//            Image(systemName: "person")
-//            Text("First")
-//        }
-//    Text("Second")
-//        .tabItem {
-//            Image(systemName: "gear")
-//            Text("Second")
-//        }
-//}
-//
-//struct ContentView_Previews: PreviewProvider {
-//    static var previews: some View {
-//        ContentView()
-//    }
-//}
